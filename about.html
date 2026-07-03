@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About CVCraft – Free, Private Resume Builder</title>
+<meta name="description" content="CVCraft builds a free, ATS-friendly resume builder that runs entirely in your browser. No accounts, no uploads, no tracking of your resume content.">
+<link rel="canonical" href="https://cvcraft.app/about.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F3EC; --paper-light:#FFFFFF; --ink:#1C2321; --ink-soft:#3E4744;
+    --navy:#1F3A5F; --gold:#B08D57; --graphite:#6B6862; --border:rgba(28,35,33,0.14);
+    --serif:'Libre Caslon Text', Georgia, serif; --sans:'Inter', -apple-system, sans-serif;
+    --mono:'IBM Plex Mono','Courier New',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.65;}
+  a{color:var(--gold);}
+  .wrap{max-width:720px;margin:0 auto;padding:0 24px;}
+  header.site{border-bottom:1px solid var(--border);background:var(--paper);position:sticky;top:0;z-index:50;}
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0;max-width:1120px;margin:0 auto;padding-left:24px;padding-right:24px;}
+  .brand{font-family:var(--serif);font-weight:700;font-size:1.4rem;text-decoration:none;color:var(--ink);}
+  .brand span{color:var(--gold);}
+  nav.tools-nav{display:flex;gap:26px;font-family:var(--mono);font-size:0.76rem;letter-spacing:0.04em;text-transform:uppercase;}
+  nav.tools-nav a{text-decoration:none;color:var(--ink-soft);}
+  nav.tools-nav a:hover{color:var(--gold);}
+  .page-head{padding:52px 0 8px;}
+  .eyebrow{font-family:var(--mono);text-transform:uppercase;letter-spacing:0.08em;font-size:0.78rem;color:var(--gold);margin-bottom:12px;}
+  h1{font-family:var(--serif);font-size:clamp(1.9rem,3.6vw,2.6rem);font-weight:700;margin:0 0 24px;}
+  h2{font-family:var(--serif);font-size:1.3rem;font-weight:700;margin:34px 0 10px;}
+  p{color:var(--ink-soft);margin:0 0 16px;}
+  .content{padding-bottom:64px;}
+  footer{border-top:1px solid var(--border);padding:30px 0;font-family:var(--mono);font-size:0.8rem;color:var(--graphite);}
+  footer .foot-row{max-width:1120px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+  footer a{text-decoration:none;color:var(--ink-soft);margin-right:16px;}
+  footer a:hover{color:var(--gold);}
+  @media(max-width:820px){ nav.tools-nav{display:none;} }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="site-nav">
+    <a href="/" class="brand">CV<span>Craft</span></a>
+    <nav class="tools-nav">
+      <a href="/builder.html">Builder</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap content">
+  <div class="page-head">
+    <div class="eyebrow">About</div>
+    <h1>One clean resume, built the honest way.</h1>
+  </div>
+
+  <p>CVCraft is a free resume builder for one job: help you produce a clean, professional, ATS-friendly resume without an account, a paywall, or a gallery of fifty near-identical templates.</p>
+
+  <h2>Why one template, not fifty</h2>
+  <p>Most resume sites lead with visual variety — colorful sidebars, icon-heavy skill bars, multi-column layouts. Many of those designs look great to a human and get scrambled by the applicant tracking software that actually screens resumes first at most companies. CVCraft uses a single, deliberately plain, single-column layout that's built to be read correctly by both software and people.</p>
+
+  <h2>How the PDF export works</h2>
+  <p>When you click "Download PDF," CVCraft draws your resume directly as text objects using a PDF library called jsPDF — it does not take a screenshot of the page. That means the text in your downloaded file is selectable, copyable, and extractable by ATS software, the same way a resume built in a word processor would be.</p>
+
+  <h2>What we're honest about</h2>
+  <p>This is one template with a small set of accent color options — not a design studio. If you need a heavily stylized, portfolio-style resume for a creative role, a different tool may suit you better. CVCraft is built for roles where clarity and ATS compatibility matter more than visual flair.</p>
+
+  <h2>Your data</h2>
+  <p>Everything you type is processed in your browser. Your draft is saved locally on your device using your browser's storage so you don't lose progress — it is never uploaded to a server. See our <a href="/privacy.html">Privacy Policy</a> for details.</p>
+
+  <h2>Get in touch</h2>
+  <p>Found a bug or have feedback? Visit our <a href="/contact.html">contact page</a>.</p>
+</main>
+
+<footer>
+  <div class="foot-row">
+    <div><a href="/about.html">About</a><a href="/contact.html">Contact</a><a href="/privacy.html">Privacy Policy</a></div>
+    <div>© <span id="yr"></span> CVCraft. Your data stays in your browser.</div>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+</body>
+</html>

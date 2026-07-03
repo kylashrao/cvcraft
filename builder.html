@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume Builder – Free ATS-Friendly PDF Export | CVCraft</title>
+<meta name="description" content="Build your resume section by section and export a real, text-based, ATS-friendly PDF. Free, private, autosaved locally — nothing is uploaded.">
+<link rel="canonical" href="https://cvcraft.app/builder.html">
+<meta name="robots" content="noindex, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --paper:#F6F3EC; --paper-light:#FFFFFF; --ink:#1C2321; --ink-soft:#3E4744;
+    --navy:#1F3A5F; --gold:#B08D57; --graphite:#6B6862; --border:rgba(28,35,33,0.14);
+    --serif:'Libre Caslon Text', Georgia, serif; --sans:'Inter', -apple-system, sans-serif;
+    --mono:'IBM Plex Mono','Courier New',monospace;
+    --accent:#1F3A5F;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5;}
+  a{color:inherit;}
+  .wrap{max-width:1320px;margin:0 auto;padding:0 24px;}
+
+  header.site{border-bottom:1px solid var(--border);background:var(--paper);}
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:16px 0;max-width:1320px;margin:0 auto;padding-left:24px;padding-right:24px;}
+  .brand{font-family:var(--serif);font-weight:700;font-size:1.3rem;text-decoration:none;color:var(--ink);}
+  .brand span{color:var(--gold);}
+  .site-nav a.back{font-family:var(--mono);font-size:0.76rem;text-decoration:none;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.04em;}
+  .site-nav a.back:hover{color:var(--gold);}
+
+  /* toolbar */
+  .toolbar{
+    position:sticky;top:0;z-index:60;
+    background:var(--paper-light);border-bottom:1px solid var(--border);
+    padding:12px 0;
+  }
+  .toolbar-inner{display:flex;align-items:center;flex-wrap:wrap;gap:16px;justify-content:space-between;}
+  .toolbar-group{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .toolbar label{font-family:var(--mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--graphite);margin-right:6px;}
+  .toolbar select{
+    font-family:var(--mono);font-size:0.78rem;padding:6px 8px;border:1px solid var(--border);border-radius:3px;background:var(--paper);color:var(--ink);
+  }
+  .swatches{display:flex;gap:6px;}
+  .swatch{width:20px;height:20px;border-radius:50%;border:2px solid transparent;cursor:pointer;}
+  .swatch.active{border-color:var(--ink);}
+  .btn{font-family:var(--mono);font-size:0.76rem;text-transform:uppercase;letter-spacing:0.03em;padding:9px 14px;border-radius:3px;border:1px solid var(--navy);background:transparent;color:var(--navy);cursor:pointer;}
+  .btn-primary{background:var(--navy);color:#fff;}
+  .btn-ghost{border-color:var(--border);color:var(--ink-soft);}
+
+  /* builder layout */
+  .builder-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;padding:28px 0 80px;align-items:start;}
+  .form-col{display:flex;flex-direction:column;gap:18px;}
+  .preview-col{position:sticky;top:78px;}
+
+  .panel{background:var(--paper-light);border:1px solid var(--border);border-radius:5px;padding:22px;}
+  .panel h2{font-family:var(--serif);font-size:1.15rem;font-weight:700;margin:0 0 4px;}
+  .panel .hint{font-family:var(--sans);font-size:0.82rem;color:var(--graphite);margin:0 0 16px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+  .field-row.three{grid-template-columns:1fr 1fr 1fr;}
+  .field{display:flex;flex-direction:column;gap:5px;}
+  .field.full{grid-column:1 / -1;}
+  .field label{font-family:var(--mono);font-size:0.68rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--graphite);}
+  .field input, .field textarea{
+    padding:9px 10px;border:1px solid var(--border);border-radius:3px;background:var(--paper);
+    font-family:var(--sans);font-size:0.92rem;color:var(--ink);
+  }
+  .field textarea{resize:vertical;min-height:70px;}
+  .field input:focus, .field textarea:focus{outline:2px solid var(--gold);outline-offset:1px;}
+  .checkbox-row{display:flex;align-items:center;gap:8px;font-size:0.85rem;color:var(--ink-soft);margin-bottom:12px;}
+
+  .entry-card{border:1px solid var(--border);border-radius:4px;padding:16px;margin-bottom:14px;position:relative;background:var(--paper);}
+  .entry-card .entry-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .entry-card .entry-label{font-family:var(--mono);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--gold);}
+  .remove-btn{background:none;border:none;color:var(--graphite);font-family:var(--mono);font-size:0.72rem;cursor:pointer;text-transform:uppercase;}
+  .remove-btn:hover{color:#a33;}
+  .add-btn{
+    font-family:var(--mono);font-size:0.78rem;text-transform:uppercase;letter-spacing:0.03em;
+    background:none;border:1px dashed var(--border);border-radius:4px;padding:10px;width:100%;color:var(--navy);cursor:pointer;
+  }
+  .add-btn:hover{border-color:var(--navy);}
+
+  /* preview sheet */
+  .sheet-shell{background:var(--paper-light);border:1px solid var(--border);border-radius:5px;box-shadow:0 18px 40px rgba(28,35,33,0.10);padding:18px;}
+  .sheet{
+    background:#fff;padding:46px 42px;min-height:600px;
+    font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color:#1a1a1a;
+  }
+  .sheet .r-name{font-size:1.7rem;font-weight:700;letter-spacing:-0.01em;}
+  .sheet .r-title{font-size:0.95rem;color:var(--accent);font-weight:600;margin-top:2px;}
+  .sheet .r-contact{font-size:0.78rem;color:#555;margin-top:6px;}
+  .sheet .r-rule{height:2px;background:var(--accent);width:50px;margin:14px 0 16px;}
+  .sheet .r-section-title{font-size:0.74rem;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;color:var(--accent);margin:18px 0 8px;border-bottom:1px solid #ddd;padding-bottom:4px;}
+  .sheet .r-section-title:first-of-type{margin-top:0;}
+  .sheet p, .sheet .r-body{font-size:0.85rem;color:#2a2a2a;margin:0 0 6px;line-height:1.5;}
+  .sheet .r-entry-head{display:flex;justify-content:space-between;font-size:0.87rem;font-weight:600;margin-top:10px;}
+  .sheet .r-entry-sub{font-size:0.8rem;color:#555;font-style:italic;margin-bottom:4px;}
+  .sheet .r-bullets{margin:4px 0 0;padding-left:16px;}
+  .sheet .r-bullets li{font-size:0.83rem;color:#2a2a2a;margin-bottom:3px;line-height:1.45;}
+  .sheet .r-empty{color:#999;font-style:italic;font-size:0.85rem;}
+  .preview-footnote{font-family:var(--mono);font-size:0.72rem;color:var(--graphite);text-align:center;margin-top:10px;}
+
+  footer{border-top:1px solid var(--border);padding:26px 0;font-family:var(--mono);font-size:0.8rem;color:var(--graphite);}
+  footer .foot-row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;max-width:1320px;margin:0 auto;padding:0 24px;}
+  footer a{text-decoration:none;color:var(--ink-soft);margin-right:16px;}
+  footer a:hover{color:var(--gold);}
+
+  @media(max-width:980px){
+    .builder-grid{grid-template-columns:1fr;}
+    .preview-col{position:static;}
+    .field-row, .field-row.three{grid-template-columns:1fr 1fr;}
+  }
+  @media(max-width:560px){
+    .field-row, .field-row.three{grid-template-columns:1fr;}
+    .sheet{padding:28px 22px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="site-nav">
+    <a href="/" class="brand">CV<span>Craft</span></a>
+    <a href="/" class="back">← Back to home</a>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="wrap toolbar-inner">
+    <div class="toolbar-group">
+      <div>
+        <label for="paperSize">Paper</label>
+        <select id="paperSize">
+          <option value="letter">US Letter</option>
+          <option value="a4">A4</option>
+        </select>
+      </div>
+      <div>
+        <label>Accent</label>
+        <span class="swatches" id="swatches"></span>
+      </div>
+    </div>
+    <div class="toolbar-group">
+      <button class="btn btn-ghost" id="loadSampleBtn" type="button">Load sample</button>
+      <button class="btn btn-ghost" id="startOverBtn" type="button">Start over</button>
+      <button class="btn btn-primary" id="downloadBtn" type="button">Download PDF</button>
+    </div>
+  </div>
+</div>
+
+<main class="wrap builder-grid">
+  <div class="form-col">
+
+    <div class="panel">
+      <h2>Personal details</h2>
+      <p class="hint">This appears at the top of your resume.</p>
+      <div class="field-row">
+        <div class="field"><label for="p-name">Full name</label><input id="p-name" placeholder="Jordan Ellery"></div>
+        <div class="field"><label for="p-title">Job title / role</label><input id="p-title" placeholder="Senior Product Manager"></div>
+      </div>
+      <div class="field-row three">
+        <div class="field"><label for="p-email">Email</label><input id="p-email" placeholder="jordan@email.com"></div>
+        <div class="field"><label for="p-phone">Phone</label><input id="p-phone" placeholder="(555) 019-2231"></div>
+        <div class="field"><label for="p-location">Location</label><input id="p-location" placeholder="Austin, TX"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label for="p-linkedin">LinkedIn (optional)</label><input id="p-linkedin" placeholder="linkedin.com/in/jordanellery"></div>
+        <div class="field"><label for="p-website">Website / portfolio (optional)</label><input id="p-website" placeholder="jordanellery.com"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Professional summary</h2>
+      <p class="hint">2–4 sentences. Optional but recommended.</p>
+      <div class="field full">
+        <textarea id="p-summary" placeholder="Results-driven product manager with 8+ years leading cross-functional teams to ship high-impact consumer products..."></textarea>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Experience</h2>
+      <p class="hint">Most recent role first. One bullet per line.</p>
+      <div id="experienceList"></div>
+      <button class="add-btn" id="addExperienceBtn" type="button">+ Add another role</button>
+    </div>
+
+    <div class="panel">
+      <h2>Education</h2>
+      <div id="educationList"></div>
+      <button class="add-btn" id="addEducationBtn" type="button">+ Add another school</button>
+    </div>
+
+    <div class="panel">
+      <h2>Skills</h2>
+      <p class="hint">Separate with commas.</p>
+      <div class="field full">
+        <input id="p-skills" placeholder="Product Strategy, SQL, A/B Testing, Figma, Roadmapping">
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Additional section</h2>
+      <p class="hint">Optional — certifications, projects, awards, publications, etc.</p>
+      <div class="field full" style="margin-bottom:14px;">
+        <label for="extraLabel">Section title</label>
+        <input id="extraLabel" placeholder="Certifications">
+      </div>
+      <div id="extraList"></div>
+      <button class="add-btn" id="addExtraBtn" type="button">+ Add item</button>
+    </div>
+  </div>
+
+  <div class="preview-col">
+    <div class="sheet-shell">
+      <div class="sheet" id="sheet"></div>
+    </div>
+    <div class="preview-footnote">Live preview — the downloaded PDF uses real text, not an image of this page.</div>
+  </div>
+</main>
+
+<footer>
+  <div class="foot-row">
+    <div><a href="/about.html">About</a><a href="/contact.html">Contact</a><a href="/privacy.html">Privacy Policy</a></div>
+    <div>© <span id="yr"></span> CVCraft. Your data stays in your browser.</div>
+  </div>
+</footer>
+
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+/* ---------- state ---------- */
+const ACCENTS = [
+  {name:'Navy', hex:'#1F3A5F'},
+  {name:'Forest', hex:'#2F4F3E'},
+  {name:'Burgundy', hex:'#6B2737'},
+  {name:'Charcoal', hex:'#33383B'},
+  {name:'Slate', hex:'#3C5A78'}
+];
+
+function uid(){ return 'id' + Math.random().toString(36).slice(2, 10); }
+
+function blankState(){
+  return {
+    paperSize: 'letter',
+    accent: ACCENTS[0].hex,
+    personal: {name:'', title:'', email:'', phone:'', location:'', linkedin:'', website:''},
+    summary: '',
+    experience: [],
+    education: [],
+    skills: '',
+    extraLabel: 'Certifications',
+    extra: []
+  };
+}
+
+function sampleState(){
+  return {
+    paperSize: 'letter',
+    accent: ACCENTS[0].hex,
+    personal: {name:'Jordan Ellery', title:'Senior Product Manager', email:'jordan@email.com', phone:'(555) 019-2231', location:'Austin, TX', linkedin:'linkedin.com/in/jordanellery', website:'jordanellery.com'},
+    summary: 'Results-driven product manager with 8+ years leading cross-functional teams to ship high-impact consumer products. Known for turning ambiguous problems into clear roadmaps and shipping on time.',
+    experience: [
+      {id:uid(), jobTitle:'Senior Product Manager', company:'Northlight Software', location:'Austin, TX', start:'Mar 2021', end:'', current:true,
+       bullets:'Led a team of 12 across design, engineering, and data to relaunch the core onboarding flow, lifting activation by 24%\nOwned the roadmap for a $4M ARR product line, prioritizing against direct customer interviews\nPartnered with sales and support to cut churn-driving bugs by 40% quarter over quarter'},
+      {id:uid(), jobTitle:'Product Manager', company:'Fieldstone Analytics', location:'Denver, CO', start:'Jul 2018', end:'Feb 2021', current:false,
+       bullets:'Shipped the first self-serve reporting dashboard, adopted by 60% of the customer base within two quarters\nRan quarterly discovery interviews with 30+ customers to inform the annual roadmap'}
+    ],
+    education: [
+      {id:uid(), degree:'B.S. in Business Administration', school:'University of Colorado Boulder', location:'Boulder, CO', gradDate:'May 2018', extra:''}
+    ],
+    skills: 'Product Strategy, SQL, A/B Testing, Figma, Roadmapping, Stakeholder Management, Agile/Scrum',
+    extraLabel: 'Certifications',
+    extra: [
+      {id:uid(), title:'Certified Scrum Product Owner (CSPO)', detail:'Scrum Alliance, 2022'}
+    ]
+  };
+}
+
+let state = blankState();
+
+/* ---------- persistence ---------- */
+const STORAGE_KEY = 'cvcraft_draft_v1';
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){ /* storage unavailable, fail silently */ }
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ return Object.assign(blankState(), JSON.parse(raw)); }
+  }catch(e){ /* corrupted or unavailable, fall back to blank */ }
+  return null;
+}
+
+/* ---------- helpers ---------- */
+function dateRange(start, end, current){
+  const s = (start||'').trim();
+  const e = current ? 'Present' : (end||'').trim();
+  if(s && e) return s + ' – ' + e;
+  if(s) return s;
+  if(e) return e;
+  return '';
+}
+function parseSkills(raw){
+  return (raw||'').split(',').map(s=>s.trim()).filter(Boolean);
+}
+function parseBullets(raw){
+  return (raw||'').split('\n').map(b=>b.trim()).filter(Boolean);
+}
+function escapeHtml(s){
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ---------- render: form lists ---------- */
+function renderExperienceForm(){
+  const el = document.getElementById('experienceList');
+  el.innerHTML = state.experience.map((exp, idx) => `
+    <div class="entry-card" data-id="${exp.id}">
+      <div class="entry-top">
+        <span class="entry-label">Role ${idx+1}</span>
+        <button class="remove-btn" data-action="remove-exp" data-id="${exp.id}" type="button">Remove</button>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Job title</label><input data-field="jobTitle" data-id="${exp.id}" value="${escapeHtml(exp.jobTitle)}" placeholder="Senior Product Manager"></div>
+        <div class="field"><label>Company</label><input data-field="company" data-id="${exp.id}" value="${escapeHtml(exp.company)}" placeholder="Northlight Software"></div>
+      </div>
+      <div class="field-row three">
+        <div class="field"><label>Location</label><input data-field="location" data-id="${exp.id}" value="${escapeHtml(exp.location)}" placeholder="Austin, TX"></div>
+        <div class="field"><label>Start</label><input data-field="start" data-id="${exp.id}" value="${escapeHtml(exp.start)}" placeholder="Mar 2021"></div>
+        <div class="field"><label>End</label><input data-field="end" data-id="${exp.id}" value="${escapeHtml(exp.end)}" placeholder="Feb 2024" ${exp.current?'disabled':''}></div>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" data-field="current" data-id="${exp.id}" id="current-${exp.id}" ${exp.current?'checked':''}>
+        <label for="current-${exp.id}">I currently work here</label>
+      </div>
+      <div class="field full">
+        <label>Achievements (one per line)</label>
+        <textarea data-field="bullets" data-id="${exp.id}" placeholder="Led a team of 12 to relaunch onboarding, lifting activation by 24%">${escapeHtml(exp.bullets)}</textarea>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderEducationForm(){
+  const el = document.getElementById('educationList');
+  el.innerHTML = state.education.map((ed, idx) => `
+    <div class="entry-card" data-id="${ed.id}">
+      <div class="entry-top">
+        <span class="entry-label">School ${idx+1}</span>
+        <button class="remove-btn" data-action="remove-edu" data-id="${ed.id}" type="button">Remove</button>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Degree</label><input data-field="degree" data-id="${ed.id}" value="${escapeHtml(ed.degree)}" placeholder="B.S. in Business Administration"></div>
+        <div class="field"><label>School</label><input data-field="school" data-id="${ed.id}" value="${escapeHtml(ed.school)}" placeholder="University of Colorado Boulder"></div>
+      </div>
+      <div class="field-row three">
+        <div class="field"><label>Location</label><input data-field="location" data-id="${ed.id}" value="${escapeHtml(ed.location)}" placeholder="Boulder, CO"></div>
+        <div class="field"><label>Graduation</label><input data-field="gradDate" data-id="${ed.id}" value="${escapeHtml(ed.gradDate)}" placeholder="May 2018"></div>
+        <div class="field"><label>Honors (optional)</label><input data-field="extra" data-id="${ed.id}" value="${escapeHtml(ed.extra)}" placeholder="Magna Cum Laude"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderExtraForm(){
+  const el = document.getElementById('extraList');
+  el.innerHTML = state.extra.map((item, idx) => `
+    <div class="entry-card" data-id="${item.id}">
+      <div class="entry-top">
+        <span class="entry-label">Item ${idx+1}</span>
+        <button class="remove-btn" data-action="remove-extra" data-id="${item.id}" type="button">Remove</button>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Title</label><input data-field="title" data-id="${item.id}" value="${escapeHtml(item.title)}" placeholder="Certified Scrum Product Owner"></div>
+        <div class="field"><label>Detail</label><input data-field="detail" data-id="${item.id}" value="${escapeHtml(item.detail)}" placeholder="Scrum Alliance, 2022"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ---------- render: live preview sheet ---------- */
+function renderPreview(){
+  const p = state.personal;
+  const contactParts = [p.email, p.phone, p.location, p.linkedin, p.website].filter(Boolean);
+  let html = '';
+  html += `<div class="r-name">${escapeHtml(p.name) || 'Your Name'}</div>`;
+  if(p.title) html += `<div class="r-title">${escapeHtml(p.title)}</div>`;
+  html += `<div class="r-contact">${contactParts.length ? escapeHtml(contactParts.join('  ·  ')) : 'email · phone · location'}</div>`;
+  html += `<div class="r-rule"></div>`;
+
+  if(state.summary.trim()){
+    html += `<div class="r-section-title">Summary</div><p class="r-body">${escapeHtml(state.summary)}</p>`;
+  }
+
+  if(state.experience.length){
+    html += `<div class="r-section-title">Experience</div>`;
+    state.experience.forEach(exp => {
+      const range = dateRange(exp.start, exp.end, exp.current);
+      html += `<div class="r-entry-head"><span>${escapeHtml(exp.jobTitle)||'Job title'}${exp.company ? ' — ' + escapeHtml(exp.company) : ''}</span><span>${escapeHtml(range)}</span></div>`;
+      if(exp.location) html += `<div class="r-entry-sub">${escapeHtml(exp.location)}</div>`;
+      const bullets = parseBullets(exp.bullets);
+      if(bullets.length){
+        html += `<ul class="r-bullets">` + bullets.map(b=>`<li>${escapeHtml(b)}</li>`).join('') + `</ul>`;
+      }
+    });
+  }
+
+  if(state.education.length){
+    html += `<div class="r-section-title">Education</div>`;
+    state.education.forEach(ed => {
+      html += `<div class="r-entry-head"><span>${escapeHtml(ed.degree)||'Degree'}${ed.school ? ' — ' + escapeHtml(ed.school) : ''}</span><span>${escapeHtml(ed.gradDate)}</span></div>`;
+      const subParts = [ed.location, ed.extra].filter(Boolean);
+      if(subParts.length) html += `<div class="r-entry-sub">${escapeHtml(subParts.join(' · '))}</div>`;
+    });
+  }
+
+  const skillsArr = parseSkills(state.skills);
+  if(skillsArr.length){
+    html += `<div class="r-section-title">Skills</div><p class="r-body">${escapeHtml(skillsArr.join(', '))}</p>`;
+  }
+
+  if(state.extra.length){
+    html += `<div class="r-section-title">${escapeHtml(state.extraLabel || 'Additional')}</div>`;
+    state.extra.forEach(item => {
+      if(!item.title && !item.detail) return;
+      html += `<p class="r-body"><strong>${escapeHtml(item.title)}</strong>${item.detail ? ' — ' + escapeHtml(item.detail) : ''}</p>`;
+    });
+  }
+
+  if(!p.name && !state.summary && !state.experience.length && !state.education.length && !skillsArr.length){
+    html += `<p class="r-empty">Fill in the form to see your resume take shape here.</p>`;
+  }
+
+  document.getElementById('sheet').innerHTML = html;
+}
+
+function renderAll(){
+  document.getElementById('p-name').value = state.personal.name;
+  document.getElementById('p-title').value = state.personal.title;
+  document.getElementById('p-email').value = state.personal.email;
+  document.getElementById('p-phone').value = state.personal.phone;
+  document.getElementById('p-location').value = state.personal.location;
+  document.getElementById('p-linkedin').value = state.personal.linkedin;
+  document.getElementById('p-website').value = state.personal.website;
+  document.getElementById('p-summary').value = state.summary;
+  document.getElementById('p-skills').value = state.skills;
+  document.getElementById('extraLabel').value = state.extraLabel;
+  document.getElementById('paperSize').value = state.paperSize;
+  renderExperienceForm();
+  renderEducationForm();
+  renderExtraForm();
+  renderSwatches();
+  renderPreview();
+}
+
+function renderSwatches(){
+  const el = document.getElementById('swatches');
+  el.innerHTML = ACCENTS.map(a => `<span class="swatch ${a.hex===state.accent?'active':''}" style="background:${a.hex}" data-hex="${a.hex}" title="${a.name}"></span>`).join('');
+  document.documentElement.style.setProperty('--accent', state.accent);
+}
+
+/* ---------- event wiring ---------- */
+document.getElementById('p-name').addEventListener('input', e => { state.personal.name = e.target.value; renderPreview(); saveState(); });
+document.getElementById('p-title').addEventListener('input', e => { state.personal.title = e.target.value; renderPreview(); saveState(); });
+document.getElementById('p-email').addEventListener('input', e => { state.personal.email = e.target.value; renderPreview(); saveState(); });
+document.getElementById('p-phone').addEventListener('input', e => { state.personal.phone = e.target.value; renderPreview(); saveState(); });
+document.getElementById('p-location').addEventListener('input', e => { state.personal.location = e.target.value; renderPreview(); saveState(); });
+document.getElementById('p-linkedin').addEventListener('input', e => { state.personal.linkedin = e.target.value; renderPreview(); saveState(); });
+document.getElementById('p-website').addEventListener('input', e => { state.personal.website = e.target.value; renderPreview(); saveState(); });
+document.getElementById('p-summary').addEventListener('input', e => { state.summary = e.target.value; renderPreview(); saveState(); });
+document.getElementById('p-skills').addEventListener('input', e => { state.skills = e.target.value; renderPreview(); saveState(); });
+document.getElementById('extraLabel').addEventListener('input', e => { state.extraLabel = e.target.value; renderPreview(); saveState(); });
+document.getElementById('paperSize').addEventListener('change', e => { state.paperSize = e.target.value; saveState(); });
+
+document.getElementById('swatches').addEventListener('click', e => {
+  if(e.target.classList.contains('swatch')){
+    state.accent = e.target.dataset.hex;
+    renderSwatches();
+    saveState();
+  }
+});
+
+document.getElementById('addExperienceBtn').addEventListener('click', () => {
+  state.experience.push({id:uid(), jobTitle:'', company:'', location:'', start:'', end:'', current:false, bullets:''});
+  renderExperienceForm(); renderPreview(); saveState();
+});
+document.getElementById('addEducationBtn').addEventListener('click', () => {
+  state.education.push({id:uid(), degree:'', school:'', location:'', gradDate:'', extra:''});
+  renderEducationForm(); renderPreview(); saveState();
+});
+document.getElementById('addExtraBtn').addEventListener('click', () => {
+  state.extra.push({id:uid(), title:'', detail:''});
+  renderExtraForm(); renderPreview(); saveState();
+});
+
+/* event delegation for dynamic entry fields */
+document.getElementById('experienceList').addEventListener('input', e => {
+  const id = e.target.dataset.id, field = e.target.dataset.field;
+  if(!id || !field) return;
+  const exp = state.experience.find(x=>x.id===id);
+  if(!exp) return;
+  exp[field] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+  if(field === 'current'){ renderExperienceForm(); }
+  renderPreview(); saveState();
+});
+document.getElementById('experienceList').addEventListener('click', e => {
+  if(e.target.dataset.action === 'remove-exp'){
+    state.experience = state.experience.filter(x=>x.id!==e.target.dataset.id);
+    renderExperienceForm(); renderPreview(); saveState();
+  }
+});
+
+document.getElementById('educationList').addEventListener('input', e => {
+  const id = e.target.dataset.id, field = e.target.dataset.field;
+  if(!id || !field) return;
+  const ed = state.education.find(x=>x.id===id);
+  if(!ed) return;
+  ed[field] = e.target.value;
+  renderPreview(); saveState();
+});
+document.getElementById('educationList').addEventListener('click', e => {
+  if(e.target.dataset.action === 'remove-edu'){
+    state.education = state.education.filter(x=>x.id!==e.target.dataset.id);
+    renderEducationForm(); renderPreview(); saveState();
+  }
+});
+
+document.getElementById('extraList').addEventListener('input', e => {
+  const id = e.target.dataset.id, field = e.target.dataset.field;
+  if(!id || !field) return;
+  const item = state.extra.find(x=>x.id===id);
+  if(!item) return;
+  item[field] = e.target.value;
+  renderPreview(); saveState();
+});
+document.getElementById('extraList').addEventListener('click', e => {
+  if(e.target.dataset.action === 'remove-extra'){
+    state.extra = state.extra.filter(x=>x.id!==e.target.dataset.id);
+    renderExtraForm(); renderPreview(); saveState();
+  }
+});
+
+document.getElementById('loadSampleBtn').addEventListener('click', () => {
+  if(state.personal.name || state.experience.length){
+    if(!confirm('This will replace your current draft with sample data. Continue?')) return;
+  }
+  state = sampleState();
+  renderAll(); saveState();
+});
+document.getElementById('startOverBtn').addEventListener('click', () => {
+  if(!confirm("This will clear everything you've entered. Continue?")) return;
+  state = blankState();
+  localStorage.removeItem(STORAGE_KEY);
+  renderAll();
+});
+
+/* ---------- PDF export ---------- */
+function hexToRgb(hex){
+  const m = hex.replace('#','');
+  return [parseInt(m.slice(0,2),16), parseInt(m.slice(2,4),16), parseInt(m.slice(4,6),16)];
+}
+
+document.getElementById('downloadBtn').addEventListener('click', () => {
+  try{
+    exportPDF();
+  }catch(err){
+    console.error(err);
+    alert('Something went wrong generating the PDF. Please try again — if it keeps happening, use the Contact page to report it.');
+  }
+});
+
+function exportPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format: state.paperSize === 'a4' ? 'a4' : 'letter' });
+
+  const MARGIN = 54;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const contentWidth = pageWidth - MARGIN*2;
+  const MAX_Y = pageHeight - MARGIN;
+  const [ar,ag,ab] = hexToRgb(state.accent);
+
+  let y = MARGIN;
+
+  function ensureSpace(h){
+    if(y + h > MAX_Y){
+      doc.addPage();
+      y = MARGIN;
+    }
+  }
+
+  function sectionHeader(label){
+    ensureSpace(26);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(ar,ag,ab);
+    doc.text(label.toUpperCase(), MARGIN, y);
+    y += 4;
+    doc.setDrawColor(210,210,210);
+    doc.setLineWidth(0.75);
+    doc.line(MARGIN, y, pageWidth - MARGIN, y);
+    y += 16;
+    doc.setTextColor(20,20,20);
+  }
+
+  function wrappedText(text, x, width, fontSize, lineHeight, font='helvetica', style='normal'){
+    doc.setFont(font, style);
+    doc.setFontSize(fontSize);
+    const lines = doc.splitTextToSize(text, width);
+    lines.forEach(line => {
+      ensureSpace(lineHeight);
+      doc.text(line, x, y);
+      y += lineHeight;
+    });
+  }
+
+  // --- header ---
+  const p = state.personal;
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(22);
+  doc.setTextColor(20,20,20);
+  doc.text(p.name || 'Your Name', MARGIN, y);
+  y += 22;
+
+  if(p.title){
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(11.5);
+    doc.setTextColor(ar,ag,ab);
+    doc.text(p.title, MARGIN, y);
+    y += 16;
+  }
+
+  const contactParts = [p.email, p.phone, p.location, p.linkedin, p.website].filter(Boolean);
+  if(contactParts.length){
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(9.5);
+    doc.setTextColor(80,80,80);
+    wrappedText(contactParts.join('   |   '), MARGIN, contentWidth, 9.5, 13);
+  }
+
+  y += 4;
+  doc.setDrawColor(ar,ag,ab);
+  doc.setLineWidth(1.5);
+  doc.line(MARGIN, y, MARGIN + 46, y);
+  y += 18;
+
+  // --- summary ---
+  if(state.summary.trim()){
+    sectionHeader('Summary');
+    wrappedText(state.summary.trim(), MARGIN, contentWidth, 10, 14);
+    y += 6;
+  }
+
+  // --- experience ---
+  if(state.experience.length){
+    sectionHeader('Experience');
+    state.experience.forEach(exp => {
+      const bullets = parseBullets(exp.bullets);
+      const headerLine = (exp.jobTitle||'Job title') + (exp.company ? '  —  ' + exp.company : '');
+      const range = dateRange(exp.start, exp.end, exp.current);
+
+      // keep job header + first bullet (or sub-line) together where possible
+      ensureSpace(16 + (exp.location ? 13 : 0) + (bullets.length ? 13 : 0));
+
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(10.5);
+      doc.setTextColor(20,20,20);
+      doc.text(headerLine, MARGIN, y);
+      if(range){
+        doc.setFont('helvetica','normal');
+        const rangeWidth = doc.getTextWidth(range);
+        doc.text(range, pageWidth - MARGIN - rangeWidth, y);
+      }
+      y += 14;
+
+      if(exp.location){
+        doc.setFont('helvetica','italic');
+        doc.setFontSize(9.5);
+        doc.setTextColor(90,90,90);
+        doc.text(exp.location, MARGIN, y);
+        y += 13;
+      }
+
+      doc.setTextColor(30,30,30);
+      bullets.forEach(b => {
+        doc.setFont('helvetica','normal');
+        doc.setFontSize(10);
+        const lines = doc.splitTextToSize(b, contentWidth - 14);
+        lines.forEach((line, i) => {
+          ensureSpace(13);
+          doc.text((i===0 ? '•  ' : '   ') + line, MARGIN, y);
+          y += 13;
+        });
+      });
+      y += 6;
+    });
+  }
+
+  // --- education ---
+  if(state.education.length){
+    sectionHeader('Education');
+    state.education.forEach(ed => {
+      const headerLine = (ed.degree||'Degree') + (ed.school ? '  —  ' + ed.school : '');
+      ensureSpace(16 + 13);
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(10.5);
+      doc.setTextColor(20,20,20);
+      doc.text(headerLine, MARGIN, y);
+      if(ed.gradDate){
+        doc.setFont('helvetica','normal');
+        const w = doc.getTextWidth(ed.gradDate);
+        doc.text(ed.gradDate, pageWidth - MARGIN - w, y);
+      }
+      y += 14;
+      const subParts = [ed.location, ed.extra].filter(Boolean);
+      if(subParts.length){
+        doc.setFont('helvetica','italic');
+        doc.setFontSize(9.5);
+        doc.setTextColor(90,90,90);
+        doc.text(subParts.join('  ·  '), MARGIN, y);
+        y += 13;
+      }
+      y += 4;
+      doc.setTextColor(30,30,30);
+    });
+  }
+
+  // --- skills ---
+  const skillsArr = parseSkills(state.skills);
+  if(skillsArr.length){
+    sectionHeader('Skills');
+    wrappedText(skillsArr.join('  ·  '), MARGIN, contentWidth, 10, 14);
+    y += 6;
+  }
+
+  // --- extra section ---
+  const validExtra = state.extra.filter(it => it.title || it.detail);
+  if(validExtra.length){
+    sectionHeader(state.extraLabel || 'Additional');
+    validExtra.forEach(item => {
+      ensureSpace(14);
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(10);
+      doc.setTextColor(20,20,20);
+      const titleText = item.title || '';
+      doc.text(titleText, MARGIN, y);
+      if(item.detail){
+        const titleWidth = doc.getTextWidth(titleText + '  ');
+        doc.setFont('helvetica','normal');
+        doc.setTextColor(70,70,70);
+        const remainingWidth = contentWidth - titleWidth;
+        const detailLines = doc.splitTextToSize(item.detail, Math.max(remainingWidth, 80));
+        doc.text(detailLines[0], MARGIN + titleWidth, y);
+        y += 13;
+        for(let i=1;i<detailLines.length;i++){
+          ensureSpace(13);
+          doc.text(detailLines[i], MARGIN, y);
+          y += 13;
+        }
+      } else {
+        y += 13;
+      }
+      doc.setTextColor(30,30,30);
+    });
+  }
+
+  const filename = (p.name ? p.name.trim().replace(/\s+/g,'_') : 'resume') + '.pdf';
+  doc.save(filename);
+}
+
+/* ---------- init ---------- */
+(function init(){
+  const restored = loadState();
+  state = restored || blankState();
+  renderAll();
+})();
+</script>
+</body>
+</html>

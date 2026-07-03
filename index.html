@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVCraft – Free Resume Builder with ATS-Friendly PDF Export</title>
+<meta name="description" content="Build a professional, ATS-friendly resume in your browser and download it as a real text-based PDF — free, no sign-up, no watermark. Your data never leaves your device.">
+<link rel="canonical" href="https://cvcraft.app/">
+<meta property="og:title" content="CVCraft – Free Resume Builder, ATS-Friendly PDF Export">
+<meta property="og:description" content="Build and download a professional resume in minutes. Free, private, no account needed.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "CVCraft",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Any (runs in browser)",
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+  "description": "Free browser-based resume builder with ATS-friendly, text-based PDF export."
+}
+</script>
+<style>
+  :root{
+    --paper:#F6F3EC;
+    --paper-light:#FFFFFF;
+    --ink:#1C2321;
+    --ink-soft:#3E4744;
+    --navy:#1F3A5F;
+    --gold:#B08D57;
+    --graphite:#6B6862;
+    --border:rgba(28,35,33,0.14);
+    --serif:'Libre Caslon Text', Georgia, serif;
+    --sans:'Inter', -apple-system, sans-serif;
+    --mono:'IBM Plex Mono','Courier New',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;}
+  a{color:inherit;}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px;}
+
+  header.site{border-bottom:1px solid var(--border);background:var(--paper);position:sticky;top:0;z-index:50;}
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:20px 0;}
+  .brand{font-family:var(--serif);font-weight:700;font-size:1.5rem;letter-spacing:-0.01em;text-decoration:none;color:var(--ink);}
+  .brand span{color:var(--gold);}
+  nav.tools-nav{display:flex;align-items:center;gap:28px;font-family:var(--mono);font-size:0.76rem;letter-spacing:0.04em;text-transform:uppercase;}
+  nav.tools-nav a{text-decoration:none;color:var(--ink-soft);}
+  nav.tools-nav a:hover{color:var(--gold);}
+  .nav-cta{background:var(--navy);color:#fff !important;padding:10px 18px;border-radius:3px;}
+
+  .hero{padding:72px 0 56px;display:grid;grid-template-columns:1.1fr 0.9fr;gap:48px;align-items:center;}
+  .eyebrow{font-family:var(--mono);text-transform:uppercase;letter-spacing:0.08em;font-size:0.78rem;color:var(--gold);margin-bottom:16px;}
+  h1{font-family:var(--serif);font-size:clamp(2.1rem,4vw,3.2rem);font-weight:700;line-height:1.1;margin:0 0 20px;letter-spacing:-0.01em;}
+  .lede{font-size:1.08rem;color:var(--ink-soft);max-width:52ch;margin:0 0 32px;}
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:22px;}
+  .btn{font-family:var(--mono);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.04em;padding:14px 26px;border-radius:3px;text-decoration:none;border:1px solid var(--navy);display:inline-block;}
+  .btn-primary{background:var(--navy);color:#fff;}
+  .btn-ghost{background:transparent;color:var(--navy);}
+  .trust-line{font-family:var(--mono);font-size:0.78rem;color:var(--graphite);}
+
+  /* letterhead mockup */
+  .letterhead{
+    background:var(--paper-light);
+    border:1px solid var(--border);
+    box-shadow:0 18px 40px rgba(28,35,33,0.12), 0 2px 0 var(--border);
+    border-radius:2px;
+    padding:34px 32px;
+    position:relative;
+  }
+  .letterhead::before{
+    content:'';position:absolute;top:14px;left:14px;right:14px;bottom:14px;
+    border:1px solid rgba(28,35,33,0.06);pointer-events:none;
+  }
+  .lh-name{font-family:var(--serif);font-weight:700;font-size:1.5rem;color:var(--ink);}
+  .lh-title{font-family:var(--mono);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--gold);margin-top:4px;}
+  .lh-contact{font-size:0.75rem;color:var(--graphite);margin-top:8px;}
+  .lh-rule{height:2px;background:var(--navy);margin:16px 0;width:60px;}
+  .lh-section-title{font-family:var(--mono);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--navy);margin:16px 0 6px;}
+  .lh-line{height:8px;background:var(--border);border-radius:2px;margin-bottom:6px;}
+  .lh-line.short{width:60%;}
+  .lh-line.mid{width:85%;}
+
+  section.features{padding:56px 0;}
+  .section-head{margin-bottom:36px;max-width:64ch;}
+  .section-head h2{font-family:var(--serif);font-size:1.9rem;font-weight:700;margin:0 0 10px;}
+  .section-head p{color:var(--ink-soft);margin:0;}
+  .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .feature{background:var(--paper-light);border:1px solid var(--border);border-radius:4px;padding:26px;}
+  .feature .num{font-family:var(--mono);font-size:0.72rem;color:var(--gold);letter-spacing:0.05em;}
+  .feature h3{font-family:var(--serif);font-size:1.2rem;font-weight:700;margin:10px 0 8px;}
+  .feature p{color:var(--ink-soft);font-size:0.95rem;margin:0;}
+
+  section.ats{padding:56px 0;background:var(--paper-light);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+  .ats-inner{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;}
+  .ats-inner h2{font-family:var(--serif);font-size:1.8rem;font-weight:700;margin:0 0 14px;}
+  .ats-inner p{color:var(--ink-soft);margin:0 0 14px;max-width:52ch;}
+  .compare-table{width:100%;border-collapse:collapse;font-size:0.9rem;}
+  .compare-table th{text-align:left;font-family:var(--mono);text-transform:uppercase;font-size:0.68rem;letter-spacing:0.05em;color:var(--graphite);border-bottom:1px solid var(--border);padding:10px;}
+  .compare-table td{padding:10px;border-bottom:1px dashed var(--border);color:var(--ink-soft);}
+  .compare-table .good{color:var(--navy);font-weight:600;}
+  .compare-table .bad{color:var(--gold);}
+
+  section.faq{padding:56px 0 80px;}
+  details{border-bottom:1px solid var(--border);padding:18px 0;}
+  summary{font-family:var(--serif);font-size:1.08rem;font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;}
+  summary::-webkit-details-marker{display:none;}
+  summary::after{content:'+';font-family:var(--mono);color:var(--gold);font-size:1.3rem;}
+  details[open] summary::after{content:'–';}
+  details p{color:var(--ink-soft);margin:12px 0 0;max-width:66ch;}
+
+  .final-cta{background:var(--navy);color:#fff;padding:56px 0;text-align:center;}
+  .final-cta h2{font-family:var(--serif);font-size:2rem;margin:0 0 14px;}
+  .final-cta p{color:rgba(255,255,255,0.75);margin:0 0 26px;}
+  .final-cta .btn-primary{background:var(--gold);border-color:var(--gold);color:var(--ink);}
+
+  footer{border-top:1px solid var(--border);padding:32px 0;font-family:var(--mono);font-size:0.82rem;color:var(--graphite);background:var(--paper);}
+  footer .foot-row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+  footer a{text-decoration:none;color:var(--ink-soft);margin-right:16px;}
+  footer a:hover{color:var(--gold);}
+
+  @media(max-width:900px){
+    .hero{grid-template-columns:1fr;}
+    .feature-grid{grid-template-columns:1fr;}
+    .ats-inner{grid-template-columns:1fr;}
+    nav.tools-nav a:not(.nav-cta){display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap site-nav">
+    <a href="/" class="brand">CV<span>Craft</span></a>
+    <nav class="tools-nav">
+      <a href="/#features">Features</a>
+      <a href="/about.html">About</a>
+      <a href="/builder.html" class="nav-cta">Build my resume</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <div>
+      <div class="eyebrow">Free · Private · No sign-up</div>
+      <h1>Build a resume that gets past the robots and into a hiring manager's hands.</h1>
+      <p class="lede">CVCraft is a browser-based resume builder that exports a real, text-based PDF — not a flattened image — so applicant tracking systems can actually read it. No account, no watermark, nothing uploaded.</p>
+      <div class="cta-row">
+        <a href="/builder.html" class="btn btn-primary">Start building — it's free</a>
+        <a href="#ats" class="btn btn-ghost">Why ATS-friendly matters</a>
+      </div>
+      <div class="trust-line">No email required · Works offline once loaded · Export in seconds</div>
+    </div>
+
+    <div class="letterhead">
+      <div class="lh-name">Jordan Ellery</div>
+      <div class="lh-title">Senior Product Manager</div>
+      <div class="lh-contact">jordan@email.com · (555) 019-2231 · Austin, TX</div>
+      <div class="lh-rule"></div>
+      <div class="lh-section-title">Experience</div>
+      <div class="lh-line mid"></div>
+      <div class="lh-line"></div>
+      <div class="lh-line short"></div>
+      <div class="lh-section-title">Education</div>
+      <div class="lh-line mid"></div>
+      <div class="lh-section-title">Skills</div>
+      <div class="lh-line short"></div>
+    </div>
+  </section>
+
+  <section class="features wrap" id="features">
+    <div class="section-head">
+      <h2>Built for people actually applying to jobs</h2>
+      <p>Not a template gallery with fifty gimmicky designs. One clean, professional layout, done right.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature">
+        <div class="num">01</div>
+        <h3>Selectable, parseable text</h3>
+        <p>The PDF is generated as real text objects, so you can copy-paste from it and ATS software can extract your work history correctly — unlike screenshot-style exports.</p>
+      </div>
+      <div class="feature">
+        <div class="num">02</div>
+        <h3>Live preview as you type</h3>
+        <p>See your resume take shape section by section — no waiting for a "generate" button, no surprises when you export.</p>
+      </div>
+      <div class="feature">
+        <div class="num">03</div>
+        <h3>100% private</h3>
+        <p>Everything runs in your browser. Your work history, contact details, and draft are never uploaded or stored on a server.</p>
+      </div>
+      <div class="feature">
+        <div class="num">04</div>
+        <h3>Auto-saved drafts</h3>
+        <p>Your progress is saved locally on your device as you go, so refreshing the page won't cost you your work.</p>
+      </div>
+      <div class="feature">
+        <div class="num">05</div>
+        <h3>Letter and A4 export</h3>
+        <p>Choose US Letter or A4 sizing before you download, so the PDF matches the standard expected wherever you're applying.</p>
+      </div>
+      <div class="feature">
+        <div class="num">06</div>
+        <h3>No account, no watermark</h3>
+        <p>Download as many versions as you need — tailored to different roles — without hitting a paywall or a "sign up to export" wall.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ats" id="ats">
+    <div class="wrap ats-inner">
+      <div>
+        <h2>Why a plain, single-column layout wins</h2>
+        <p>Many resume builders sell flashy two-column templates with icons, sidebars, and graphics. They look sharp to a human — and get scrambled or dropped entirely by applicant tracking systems, which most companies use to screen resumes before a person ever sees them.</p>
+        <p>CVCraft deliberately uses a single-column, text-first layout: the same structure recommended by career coaches for ATS compatibility, styled cleanly enough that it still looks sharp to a human reader too.</p>
+      </div>
+      <table class="compare-table">
+        <thead><tr><th>Layout choice</th><th>ATS compatibility</th></tr></thead>
+        <tbody>
+          <tr><td>Single column, standard headers</td><td class="good">Reliable</td></tr>
+          <tr><td>Two-column with sidebar</td><td class="bad">Often scrambled</td></tr>
+          <tr><td>Text tables and icons for skills</td><td class="bad">Frequently dropped</td></tr>
+          <tr><td>Image-based / flattened PDF</td><td class="bad">Unreadable to most parsers</td></tr>
+          <tr><td>Standard fonts (Helvetica-family)</td><td class="good">Reliable</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="faq wrap">
+    <div class="section-head"><h2>Frequently asked questions</h2></div>
+    <details open>
+      <summary>Is CVCraft really free?</summary>
+      <p>Yes. There's no account, no trial period, and no watermark on the exported PDF. The tool runs entirely in your browser, so there's no server cost tied to how many resumes you generate.</p>
+    </details>
+    <details>
+      <summary>Is my information stored anywhere?</summary>
+      <p>Your draft is saved locally in your own browser's storage so you don't lose progress on refresh — it's never transmitted to a server. Clearing your browser data or using a different device will not carry your draft over.</p>
+    </details>
+    <details>
+      <summary>What does "ATS-friendly" actually mean?</summary>
+      <p>Applicant tracking systems are the software many companies use to scan and rank resumes before a recruiter reads them. They work by extracting text — job titles, dates, skills — from your file. A resume built as flattened images or complex multi-column graphics often gets misread or garbled. CVCraft's PDF export uses real, structured text in a single-column layout so that extraction is reliable.</p>
+    </details>
+    <details>
+      <summary>Can I make more than one version for different jobs?</summary>
+      <p>Yes — there's no limit on exports. A common approach is to keep your draft general, then adjust your summary and bullet points slightly before exporting for each application.</p>
+    </details>
+  </section>
+
+  <section class="final-cta">
+    <div class="wrap">
+      <h2>Your next resume takes about ten minutes.</h2>
+      <p>No account. No credit card. Just a clean PDF you can send today.</p>
+      <a href="/builder.html" class="btn btn-primary">Start building</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot-row">
+    <div>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/privacy.html">Privacy Policy</a>
+    </div>
+    <div>© <span id="yr"></span> CVCraft. Your data stays in your browser.</div>
+  </div>
+</footer>
+
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+</body>
+</html>
